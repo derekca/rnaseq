@@ -55,25 +55,23 @@
 
 ## *A. Script Usage*
 
-`./00_submit.sh` `<suffix>`
+**./00_submit.sh** `<suffix>`
 
-`./01_pipeline.sh` `<suffix>`
+**./01_pipeline.sh** `<suffix>`
 
-`./02_bcl2fastq2.sh` `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
+**./02_bcl2fastq2.sh** `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
 
-`./03_fastqc.sh` `<raw>` `<QCraw>` `<rawNAMES>`
+**./03_fastqc.sh** `<out>` `<QCout>` `<QCnames>`
 
-`./04_trimmomatic.sh` `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
+**./04_trimmomatic.sh** `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
 
-`./03_fastqc.sh` `<trim>` `<QCtrim>` `<trimNAMES>`
+**./05_map_align.sh** `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
 
-`./05_map_align.sh` `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
+**./06_sexing.sh** `<bam>` `<sexOUT>`
 
-`./06_sexing.sh` `<bam>` `<sexOUT>`
+**./AA_qsub_split.sh**
 
-`./AA_qsub_split.sh`
-
-`./AL_logs.sh` `<module>` `<logjob>` `<input1>` `<input2>`
+**./AL_logs.sh** `<module>` `<logjob>` `<input1>` `<input2>`
 
 
 
