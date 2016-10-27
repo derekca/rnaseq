@@ -1,7 +1,5 @@
 # CONTENTS
 
----------
-
 01  Software used
 
 02  Script pipeline summary
@@ -35,42 +33,52 @@
 - ***AA_qsub_split.sh*** — sd
 - ***AL_logs.sh*** — sd
 
+## *Software Used*
+
+| Tool                 | Version        | Summary               |
+|:-------------------- |:-------------- |:--------------------- |
+| [bcl2fastq2][BC]     | 2.17.1.14      | Convert bcl to fastq. |
+| [FastQC][QC]         | 0.11.4         | Check fastq quality.  |
+| [HISAT2][H2]         | 2.0.1-beta     | Map reads.            |
+| [SAMtools][SA]       | 0.1.19-44428cd | Sort alignments.      |
+| [StringTie][ST]      | 1.2.1          | Sequence assembly.    |
+| [Trimmomatic][TR]    | 0.35           | Trim reads.           |
+
+[BC]: http://support.illumina.com/sequencing/sequencing_software/bcl2fastq-conversion-software.html
+[QC]: http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+[H2]: https://ccb.jhu.edu/software/hisat2/index.shtml
+[SA]: http://samtools.sourceforge.net/
+[ST]: https://ccb.jhu.edu/software/stringtie/
+[TR]: http://www.usadellab.org/cms/?page=trimmomatic
+
+# II. SCRIPT PIPELINE SUMMARY
+
+## *A. Script Usage*
+
+`./00_submit.sh` `<suffix>`
+
+`./01_pipeline.sh` `<suffix>`
+
+`./02_bcl2fastq2.sh` `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
+
+`./03_fastqc.sh` `<raw>` `<QCraw>` `<rawNAMES>`
+
+`./04_trimmomatic.sh` `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
+
+`./03_fastqc.sh` `<trim>` `<QCtrim>` `<trimNAMES>`
+
+`./05_map_align.sh` `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
+
+`./06_sexing.sh` `<bam>` `<sexOUT>`
+
+`./AA_qsub_split.sh`
+
+`./AL_logs.sh` `<module>` `<logjob>` `<input1>` `<input2>`
 
 
 
-## *Background*
-
-
-
-
-┌────┬────────────────────────────────────────────────────────────────┐
-│ 01 │ SOFTWARE USED                                                  │
-└────┴────────────────────────────────────────────────────────────────┘
-
-
-| Tool          | Version        | Summary               |
-|:------------- |:-------------- |:--------------------- |
-| bcl2fastq2    | 2.17.1.14      | Convert bcl to fastq. |
-| FastQC        | 0.11.4         | Check fastq quality.  |
-| HISAT2        | 2.0.1-beta     | Map reads.            |
-| SAMtools      | 0.1.19-44428cd | Sort alignments.      |
-| StringTie     | 1.2.1          | Sequence assembly.    |
-| Trimmomatic   | 0.35           | Trim reads.           |
-
-
-┌────┬────────────────────────────────────────────────────────────────┐
-│ 02 │ SCRIPT PIPELINE SUMMARY                                        │
-└────┴────────────────────────────────────────────────────────────────┘
-
-
-
-┌────┬───┐
-│ 02 │ a │ SCRIPT PIPELINE
-└────┴───┘
-
-
-
-     DIRECTORY                 PASSED VARIABLE
+```
+     DIRECTORY                 PASSED VARIABLES
 ┬
 ├─▢ AA_qsub_split.sh
 │ │
@@ -91,15 +99,13 @@
 │     └─▢ 06_sexing.sh        bam    sexOUT
 │
 └─▢ AL_logs.sh                module logjob input1     input2
+```
 
 
 
-┌────┬───┐
-│ 02 │ b │ SCRIPT DESCRIPTIONS
-└────┴───┘
+## *B. Script Descriptions*
 
-
-
+```
 ─┤AA├─  Splits an input file into individual jobs for the 00 script. Not
  │  │      necessary in the pipe, but convenient when there are many jobs.
 ─┤00├─  Submits 01 to the Cluster Nodes for batch processing. This is the
@@ -118,18 +124,12 @@
  │  │
 ─┤AL├─  Updates the logfile when a subscript calls for it.
  │  │
+```
 
 
+# III. FILES AND VARIABLES
 
-┌────┬────────────────────────────────────────────────────────────────┐
-│ 03 │ FILES AND VARIABLES                                            │
-└────┴────────────────────────────────────────────────────────────────┘
-
-
-
-┌────┬───┐
-│ 03 │ a │ DIRECTORIES THAT ARE MADE OR USED
-└────┴───┘
+## *A. Directories That Are Made Or Used*
 
 
 ```
@@ -166,11 +166,7 @@ DIRECTORY            USR¹  DESCRIPTION
 ¹Items w/ a filled box are user-required. Others are script-created.
 ```
 
-
-┌────┬───┐
-│ 03 │ b │ PASSED VARIABLE DESCRIPTIONS
-└────┴───┘
-
+## *A. Passed Variable Descriptions
 
 
 DIRECTORIES FROM INPUT.SH
@@ -204,11 +200,7 @@ refannot          Points to directory for the reference gene annotation file use
 runpath           All SEQ DATA to be processed is named in $C2sampledir.
 
 
-
-┌────┬───┐
-│ 03 │ c │ EXAMPLE IMPORT FILE FORMATS
-└────┴───┘
-
+## C. Example Import File Formats
 
 
 adapters.sh   Note¹: Adapters can be found in the SampleSheet.csv files of the raw data.
@@ -233,17 +225,11 @@ cfw04 160503_NS500351_0129_AHY5YVBGXX
 ```
 
 
+# IV. SOFTWARE NOTES
 
-┌────┬────────────────────────────────────────────────────────────────┐
-│ 04 │ SOFTWARE NOTES                                                 │
-└────┴────────────────────────────────────────────────────────────────┘
+## *A. HISAT*
 
-
-
-┌────┬───┐
-│ 04 │ a │ HISAT
-└────┴───┘
-
+```
 hisat2 -x <index>     Run HISAT2 using this reference genome index. Can be downloaded
                       from https://ccb.jhu.edu/software/hisat2
 -1                    Comma-separated list of files containing mate 1s.
@@ -264,15 +250,11 @@ samtools view         With no options or regions specified, prints all alignment
                       format is automatically detected. The [-u] option outputs uncompressed
                       BAM. This option saves time spent on compression/decompression and is
                       thus preferred when the output is piped to another samtools command.
+```
 
+## *B. StringTie*
 
-
-┌────┬───┐
-│ 04 │ b │ STRINGTIE
-└────┴───┘
-
-
-
+```
 stringtie <input.bam> Run StringTie using the input *.bam file(s)
 -o <out.gtf>          Sets output GTF name where StringTie writes assembled transcripts.
 -p <int>              Specify number of processing threads (CPUs). Default is 1.
@@ -290,15 +272,12 @@ stringtie <input.bam> Run StringTie using the input *.bam file(s)
 -e                    Limits the processing of read alignments to only estimate and output
                       the assembled transcripts matching the reference transcripts given
                       with the -G option (requires -G, recommended for -B/-b). Boosts speed.
+```
+
+## *C. Trimmomatic*
 
 
-
-┌────┬───┐
-│ 04 │ c │ TRIMMOMATIC
-└────┴───┘
-
-
-
+```
 java -jar <path to trimmomatic.jar> \                 Run JAR filepath
           [PE] \                                      Paired End Mode (as opposed to SE)
           [-threads <threads>] \                      indicates # threads to on multi-core computers.
@@ -328,6 +307,7 @@ java -jar <path to trimmomatic.jar> \                 Run JAR filepath
           AVGQUAL:        Drop the read if the average quality is below the specified level
           TOPHRED33:      Convert quality scores to Phred-33
           TOPHRED64:      Convert quality scores to Phred-64
+```
 
 
 
@@ -335,7 +315,13 @@ java -jar <path to trimmomatic.jar> \                 Run JAR filepath
 
 
 
+# V. AUTHOR NOTES
 
+- **Author:** Derek Caetano-Anolles
+- **Repository:** [github.com/derekca](https://github.com/derekca)
+- **Licenses:** Unless otherwise stated, the materials presented in this package are distributed under the [MIT License.](https://opensource.org/licenses/MIT)
+- **Acknowledgements:** These materials are based upon work supported by the National Science Foundation Postdoctoral Research Fellowship in Biology under [Grant No. 1523549.](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1523549) Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
+- **Edited:** 2016.10.27
 
 
 
