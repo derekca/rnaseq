@@ -124,6 +124,41 @@
  │  │
 ```
 
+df
+```
+READ FROM INPUT.SH, DON'T EDIT
+C1exportdir="$C1exportdir"                  # Comes from the inputfile being read right now.
+C2sampledir="$C2sampledir"                  # Comes from the inputfile being read right now.
+
+EXPORT FILES
+dirOUT="$HOME/export/$C1exportdir"          # All OUTPUT goes in folders named in col1.
+------------                              # ------------
+bam          # This is where the BAM and SORTED.BAM files go.
+ctab         # This is where the CTAB files go.
+fpkm        # This is where the FPKM files go.
+QCraw      # This is where the RAW FastQC output goes.
+QCtrim    # This is where the TRIMMED FastQC output goes.
+raw         # This is where the RAW bcl2fastq2 files go.
+sexOUT  # The output file for the sex determination.
+trim       # This is where the TRIMMED reads go.
+
+IMPORT FILES
+adapters          # File with Illumina pair-end adapters to TRIM.
+hisatidx    # Basename (no extension) of the reference genome for HISAT.
+inputfile   # CSV with two columns - $dirOUT, $runpath.
+refannot    # Reference gene annotation for StringTie.
+runpath     # All SEQ DATA to be processed is named in col2.
+
+FASTQ FILE NAMING CONVENTIONS
+rawNAMES     Naming convention of the RAW fastq files for QC.
+              The '[!Undetermined]*' ignores 'Undetermined' files.
+trimNAMES  Naming convention for the RAW fastq files being TRIMMED.
+            This focuses on the R1 names, because the Trimmomatic
+              parameters will change the R1 to R2 later.
+                '[1-9]*R1*' focuses only on R1 files starting with a number.
+```
+
+
 
 # III. FILES AND VARIABLES
 
