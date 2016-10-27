@@ -1,6 +1,7 @@
 # CONTENTS
 
 ---------
+
 01  Software used
 
 02  Script pipeline summary
@@ -47,26 +48,14 @@
 └────┴────────────────────────────────────────────────────────────────┘
 
 
-| TOOL          | VERSION       | SUMMARY  |
-| ------------- |:-------------:| -----:|
-| bcl2fastq2    | 2.17.1.14     | Convert bcl to fastq. |
-| FastQC        | 0.11.4        |   Check fastq quality. |
-| HISAT2        | 2.0.1-beta    |    Map reads. |
-| SAMtools      | 0.1.19-44428cd|    Sort alignments. |
-| StringTie     | 1.2.1         |    Sequence assembly. |
-| Trimmomatic   | 0.35          |    Trim reads. |
-
-
-
-TOOL          VERSION             SUMMARY
------------------------------------------
-bcl2fastq2    2.17.1.14           Convert bcl to fastq.
-FastQC        0.11.4              Check fastq quality.
-HISAT2        2.0.1-beta          Map reads.
-SAMtools      0.1.19-44428cd      Sort alignments.
-StringTie     1.2.1               Sequence assembly.
-Trimmomatic   0.35                Trim reads.
-
+| Tool          | Version        | Summary               |
+|:------------- |:-------------- |:--------------------- |
+| bcl2fastq2    | 2.17.1.14      | Convert bcl to fastq. |
+| FastQC        | 0.11.4         | Check fastq quality.  |
+| HISAT2        | 2.0.1-beta     | Map reads.            |
+| SAMtools      | 0.1.19-44428cd | Sort alignments.      |
+| StringTie     | 1.2.1          | Sequence assembly.    |
+| Trimmomatic   | 0.35           | Trim reads.           |
 
 
 ┌────┬────────────────────────────────────────────────────────────────┐
