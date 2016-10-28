@@ -1,5 +1,19 @@
 # I. GENERAL OVERVIEW
 
+## *A. Pipeline Overview*
+
+This pipeline takes raw NextSeq data, converts the BCL files to FASTQ files, trims the adapters off of those sequences, and then aligns the trimmed sequences onto a reference genome.
+
+An additional step sexes the (mouse) samples by searching for the presence of a mouse Y-chromosome gene, Eif2s3y. However, this particular step can be excluded in non-mouse samples, or modified with a different gene and chromosomal coordinate. This step serves as a validation of the sample, but does not contribute to the alignments in any way.
+
+This pipeline requires several files as input from the user before being ready to run.
+
+- sd
+- sd
+- sd
+- sd
+
+
 ## *File List*
 
 - *00_submit.sh* — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
@@ -34,9 +48,9 @@ The following tools must be downloaded and installed on your server in order to 
 
 
 
-# II. SCRIPT PIPELINE SUMMARY
 
-## *A. Script Usage*
+
+## *B. Script Usage*
 
 - *./00_submit.sh* `<suffix>`
 
@@ -56,29 +70,9 @@ The following tools must be downloaded and installed on your server in order to 
 
 - *./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>`
 
-```
-READ FROM INPUT.SH, DON'T EDIT
-C1exportdir="$C1exportdir"                  # Comes from the inputfile being read right now.
-C2sampledir="$C2sampledir"                  # Comes from the inputfile being read right now.
-
-EXPORT FILES
-
-IMPORT FILES
-
-FASTQ FILE NAMING CONVENTIONS
-rawNAMES     Naming convention of the RAW fastq files for QC.
-              The '[!Undetermined]*' ignores 'Undetermined' files.
-trimNAMES  Naming convention for the RAW fastq files being TRIMMED.
-            This focuses on the R1 names, because the Trimmomatic
-              parameters will change the R1 to R2 later.
-                '[1-9]*R1*' focuses only on R1 files starting with a number.
-```
 
 
-
-# III. FILES AND VARIABLES
-
-## *A. Import Files*
+## *B. Running the Pipeline*
 
 The following files are necessary to run these scripts, and should be assembled beforehand. Descriptions of each file are below.
 
@@ -121,7 +115,7 @@ cfw04 160503_NS500351_0129_AHY5YVBGXX
 - `runpath` — All SEQ DATA to be processed is named in $C2sampledir.
 
 
-adapters          # File with Illumina pair-end adapters to TRIM.
+adapters    # File with Illumina pair-end adapters to TRIM.
 hisatidx    # Basename (no extension) of the reference genome for HISAT.
 inputfile   # CSV with two columns - $dirOUT, $runpath.
 refannot    # Reference gene annotation for StringTie.
@@ -196,6 +190,14 @@ rawNAMES          Naming convention of the RAW fastq files for QC.
 trimNAMES         Naming convention for the RAW fastq files being TRIMMED.
 
 
+FASTQ FILE NAMING CONVENTIONS
+rawNAMES     Naming convention of the RAW fastq files for QC.
+              The '[!Undetermined]*' ignores 'Undetermined' files.
+trimNAMES  Naming convention for the RAW fastq files being TRIMMED.
+            This focuses on the R1 names, because the Trimmomatic
+              parameters will change the R1 to R2 later.
+                '[1-9]*R1*' focuses only on R1 files starting with a number.
+```
 
 
 
