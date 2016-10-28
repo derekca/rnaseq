@@ -1,31 +1,4 @@
-# CONTENTS
-
-
-
-01  Software used
-
-02  Script pipeline summary
-
-  a  Script pipeline
-  b  Script descriptions
-
-03  Files and variables
-
-  a  Directories that are made or used
-  b  Passed variable descriptions
-  c  Example import file formats
-
-04  Software notes
-
-  a  HISAT
-  b  StringTie
-  c  Trimmomatic
-
-
-
 # I. GENERAL OVERVIEW
-
-
 
 ## *File List*
 
@@ -63,57 +36,34 @@ The following tools must be downloaded and installed on your server in order to 
 
 # II. SCRIPT PIPELINE SUMMARY
 
-
-
 ## *A. Script Usage*
 
+- *./00_submit.sh* `<suffix>`
 
+- *./01_pipeline.sh* `<suffix>`
 
-*./00_submit.sh* `<suffix>`
+- *./02_bcl2fastq2.sh* `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
 
-*./01_pipeline.sh* `<suffix>`
+- *./03_fastqc.sh* `<out>` `<QCout>` `<QCnames>`
 
-*./02_bcl2fastq2.sh* `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
+- *./04_trimmomatic.sh* `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
 
-*./03_fastqc.sh* `<out>` `<QCout>` `<QCnames>`
+- *./05_map_align.sh* `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
 
-*./04_trimmomatic.sh* `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
+- *./06_sexing.sh* `<bam>` `<sexOUT>`
 
-*./05_map_align.sh* `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
+- *./AA_qsub_split.sh*
 
-*./06_sexing.sh* `<bam>` `<sexOUT>`
+- *./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>`
 
-*./AA_qsub_split.sh*
-
-*./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>`
-
-
-
-
-df
 ```
 READ FROM INPUT.SH, DON'T EDIT
 C1exportdir="$C1exportdir"                  # Comes from the inputfile being read right now.
 C2sampledir="$C2sampledir"                  # Comes from the inputfile being read right now.
 
 EXPORT FILES
-dirOUT="$HOME/export/$C1exportdir"          # All OUTPUT goes in folders named in col1.
-------------                              # ------------
-bam          # This is where the BAM and SORTED.BAM files go.
-ctab         # This is where the CTAB files go.
-fpkm        # This is where the FPKM files go.
-QCraw      # This is where the RAW FastQC output goes.
-QCtrim    # This is where the TRIMMED FastQC output goes.
-raw         # This is where the RAW bcl2fastq2 files go.
-sexOUT  # The output file for the sex determination.
-trim       # This is where the TRIMMED reads go.
 
 IMPORT FILES
-adapters          # File with Illumina pair-end adapters to TRIM.
-hisatidx    # Basename (no extension) of the reference genome for HISAT.
-inputfile   # CSV with two columns - $dirOUT, $runpath.
-refannot    # Reference gene annotation for StringTie.
-runpath     # All SEQ DATA to be processed is named in col2.
 
 FASTQ FILE NAMING CONVENTIONS
 rawNAMES     Naming convention of the RAW fastq files for QC.
@@ -147,8 +97,7 @@ DIRECTORY              DESCRIPTION
 ```
 
 
-- `adapters.fa` — Points to .fa file with all the adapters to be trimmed. Adapters can be found in the SampleSheet.csv files of the raw data.
-
+- `adapters.fa` — Points to a file containing all the adapters to be trimmed. Adapters can be found in the `SampleSheet.csv` which is contained in the raw NextSeq data files, or the equivalent file for your data. This file should be produced on your own, using the following template:
 ```
 >PrefixNX/1
 AGATGTGTATAAGAGACAG
@@ -156,10 +105,9 @@ AGATGTGTATAAGAGACAG
 AGATGTGTATAAGAGACAG
 ```
 
-- `hisatidx.fa` — Points to directory with the reference genome for HISAT2. More info at the [HISAT2 website.](https://ccb.jhu.edu/software/hisat2)
+- `hisatidx` — Points to directory with the reference genome for HISAT2. More info can be found at the [HISAT2 website](https://ccb.jhu.edu/software/hisat2) along with reference indices that can downloaded, if you do not want to generate your own. Regardless of the index's source, the reference genome being pointed at with this variable should be named `genome.fa`.
 
 - `input.sh` — Points to .fa file with the output dir names, and the input dir names. Col. 1 are the output folder names, Col. 2 are the input folder names. The columns need to be able to be read by a "while read" loop, so they must be separated by a single space or a tab. Leave the final line blank or it ignores the last entry.
-
 ```
 cfw01 160322_NS500351_0115_AH5KKCAFXX
 cfw02 160525_NS500351_0135_AH2F2YBGXY
@@ -173,6 +121,11 @@ cfw04 160503_NS500351_0129_AHY5YVBGXX
 - `runpath` — All SEQ DATA to be processed is named in $C2sampledir.
 
 
+adapters          # File with Illumina pair-end adapters to TRIM.
+hisatidx    # Basename (no extension) of the reference genome for HISAT.
+inputfile   # CSV with two columns - $dirOUT, $runpath.
+refannot    # Reference gene annotation for StringTie.
+runpath     # All SEQ DATA to be processed is named in col2.
 
 
 
@@ -221,9 +174,6 @@ DIRECTORY            USR¹  DESCRIPTION
 
 ```
 
-## *A. Passed Variable Descriptions
-
-
 DIRECTORIES FROM INPUT.SH
 -----------------------------
 C1exportdir       Points to the output folders that get made to store all the data.
@@ -244,6 +194,14 @@ FASTQ FILE NAMING CONVENTIONS
 -----------------------------
 rawNAMES          Naming convention of the RAW fastq files for QC.
 trimNAMES         Naming convention for the RAW fastq files being TRIMMED.
+
+
+
+
+
+
+
+
 
 
 
