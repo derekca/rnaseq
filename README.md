@@ -19,21 +19,24 @@
   b  StringTie
   c  Trimmomatic
 
+
 # I. GENERAL OVERVIEW
 
 ## *File List*
 
-- ***00_submit.sh*** — sd
-- ***01_pipeline.sh*** — sd
-- ***02_bcl2fastq2.sh*** — sd
-- ***03_fastqc.sh*** — sd
-- ***04_trimmomatic.sh*** — sd
-- ***05_map_align.sh*** — sd
-- ***06_sexing.sh*** — sd
-- ***AA_qsub_split.sh*** — sd
-- ***AL_logs.sh*** — sd
+- ***00_submit.sh*** — Generic script for running any batch job to a queue.
+- ***01_pipeline.sh*** — Runs script for project data. Specify the inputs for all subscripts and it will carry over to the others.
+- ***02_bcl2fastq2.sh*** — Runs bcl2fastq on a sample.
+- ***03_fastqc.sh*** — Checks quality of RAW or TRIMMED fastq files.
+- ***04_trimmomatic.sh*** — Runs Trimmomatic on files in the "raw" folder.
+- ***05_map_align.sh*** — Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
+- ***06_sexing.sh*** — Reads bam files out of a 'bam' folder that should already exist. Finds the Y-linked Eif2s3y gene, which determines sex. Exports a spreadsheet.
+- ***AA_qsub_split.sh*** — Takes a two-column input file and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
+- ***AL_logs.sh*** — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
 
 ## *Software Used*
+
+The following tools must be downloaded and installed on your server in order to run the scripts in this repository. The version numbers used to generate these scripts are included, but other versions should work unless substantial changes were made to the tool's accepted syntax.
 
 | Tool                 | Version        | Summary               |
 |:-------------------- |:-------------- |:--------------------- |
@@ -55,23 +58,23 @@
 
 ## *A. Script Usage*
 
-**./00_submit.sh** `<suffix>`
+***./00_submit.sh*** `<suffix>`
 
-**./01_pipeline.sh** `<suffix>`
+***./01_pipeline.sh*** `<suffix>`
 
-**./02_bcl2fastq2.sh** `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
+***./02_bcl2fastq2.sh*** `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
 
-**./03_fastqc.sh** `<out>` `<QCout>` `<QCnames>`
+***./03_fastqc.sh*** `<out>` `<QCout>` `<QCnames>`
 
-**./04_trimmomatic.sh** `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
+***./04_trimmomatic.sh*** `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
 
-**./05_map_align.sh** `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
+***./05_map_align.sh*** `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
 
-**./06_sexing.sh** `<bam>` `<sexOUT>`
+***./06_sexing.sh*** `<bam>` `<sexOUT>`
 
-**./AA_qsub_split.sh**
+***./AA_qsub_split.sh***
 
-**./AL_logs.sh** `<module>` `<logjob>` `<input1>` `<input2>`
+***./AL_logs.sh*** `<module>` `<logjob>` `<input1>` `<input2>`
 
 
 
@@ -162,7 +165,38 @@ trimNAMES  Naming convention for the RAW fastq files being TRIMMED.
 
 # III. FILES AND VARIABLES
 
-## *A. Directories That Are Made Or Used*
+## *A. Import Files*
+
+The following files are necessary to run these scripts, and should be assembled beforehand. Descriptions of each file are below.
+
+```
+DIRECTORY              DESCRIPTION
+---------------------------------------------------------------
+┬
+└─▣ $HOME              ▣ home directory
+  ├─▣ ../$runpath      ▣ location of seq-data
+  └─▣ $import          ▣ location of "Import Files"
+    ├─▣ adapters.fa    ▣ adapters file
+    ├─▣ input.sh       ▣ input file
+    ├─▣ hisatidx.fa    ▣ hisat reference index
+    └─▣ refannot.gtf   ▣ stringtie gene annotation reference
+
+```
+
+
+`adapters.fa`       Points to .fa file with all the adapters to be trimmed.
+
+`hisatidx.fa`          Points to directory with the reference genome for HISAT2. More info at the [HISAT2 website.](https://ccb.jhu.edu/software/hisat2)
+
+`input.sh`         Points to .fa file with the output dir names, and the input dir names.
+
+refannot          Points to directory for the reference gene annotation file used by StringTie.
+
+runpath           All SEQ DATA to be processed is named in $C2sampledir.
+
+
+
+## *B. Directories/files that are created by these scripts*
 
 
 ```
@@ -181,22 +215,12 @@ DIRECTORY            USR¹  DESCRIPTION
   │ ├─▢ raw            ▢    raw  fastq files from bcl
   │ └─▢ trim           ▢    trim fastq files
   │
-  ├─▣ $import          ▣    location of "Import Files"
-  │ ├─▣ adapters.fa    ▣    adapters file
-  │ ├─▣ input.sh       ▣    input file
-  │ ├─▣ hisatidx.fa    ▣    hisat reference index
-  │ └─▣ refannot.gtf   ▣    stringtie gene annotation reference
-  │
   ├─▢ $logdir          ▢    location of logfiles
   │ └─▢ $logfile       ▢    logfile in its folder
-  │
-  ├─▣ ../$runpath      ▣    location of seq-data
   │
   ├─▢ stderr.log       ▢    standard error file
   └─▢ stdout.log       ▢    standard output file
 
----------------------------------------
-¹Items w/ a filled box are user-required. Others are script-created.
 ```
 
 ## *A. Passed Variable Descriptions
@@ -222,15 +246,6 @@ FASTQ FILE NAMING CONVENTIONS
 -----------------------------
 rawNAMES          Naming convention of the RAW fastq files for QC.
 trimNAMES         Naming convention for the RAW fastq files being TRIMMED.
-
-IMPORT FILES
------------------------------
-adapters          Points to .fa file with all the adapters to be trimmed.
-hisatidx          Points to directory with the reference genome for HISAT2.
-                  More info at https://ccb.jhu.edu/software/hisat2
-inputfile         Points to .fa file with the output dir names, and the input dir names.
-refannot          Points to directory for the reference gene annotation file used by StringTie.
-runpath           All SEQ DATA to be processed is named in $C2sampledir.
 
 
 ## C. Example Import File Formats
