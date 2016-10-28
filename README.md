@@ -190,7 +190,7 @@ trimNAMES  Naming convention for the RAW fastq files being TRIMMED.
             This focuses on the R1 names, because the Trimmomatic
               parameters will change the R1 to R2 later.
                 '[1-9]*R1*' focuses only on R1 files starting with a number.
-```
+
 
 
 
