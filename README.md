@@ -24,14 +24,14 @@
 
 ## *File List*
 
-- ***00_submit.sh*** — Generic script for running any batch job to a queue.
-- ***01_pipeline.sh*** — Runs script for project data. Specify the inputs for all subscripts and it will carry over to the others.
+- ***00_submit.sh*** — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
+- ***01_pipeline.sh*** — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
 - ***02_bcl2fastq2.sh*** — Runs bcl2fastq on a sample.
 - ***03_fastqc.sh*** — Checks quality of RAW or TRIMMED fastq files.
 - ***04_trimmomatic.sh*** — Runs Trimmomatic on files in the "raw" folder.
 - ***05_map_align.sh*** — Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
 - ***06_sexing.sh*** — Reads bam files out of a 'bam' folder that should already exist. Finds the Y-linked Eif2s3y gene, which determines sex. Exports a spreadsheet.
-- ***AA_qsub_split.sh*** — Takes a two-column input file and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
+- ***AA_qsub_split.sh*** — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
 - ***AL_logs.sh*** — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
 
 ## *Software Used*
@@ -81,11 +81,8 @@ The following tools must be downloaded and installed on your server in order to 
 ## *B. Script Descriptions*
 
 ```
-─┤AA├─  Splits an input file into individual jobs for the 00 script. Not
- │  │      necessary in the pipe, but convenient when there are many jobs.
-─┤00├─  Submits 01 to the Cluster Nodes for batch processing. This is the
- │  │      starting point for all scripts run on the cluster.
-─┤01├─  Inputs and outputs for the pipeline, runs the pipe-scripts.
+─┤00├─  
+─┤01├─  
  │  │
 ─┤02├─  Converts the (raw) bcl files to fastq.
  │  │
@@ -158,15 +155,50 @@ DIRECTORY              DESCRIPTION
 ```
 
 
-`adapters.fa`       Points to .fa file with all the adapters to be trimmed.
+- `adapters.fa` — Points to .fa file with all the adapters to be trimmed. Adapters can be found in the SampleSheet.csv files of the raw data.
 
-`hisatidx.fa`          Points to directory with the reference genome for HISAT2. More info at the [HISAT2 website.](https://ccb.jhu.edu/software/hisat2)
+```
+>PrefixNX/1
+AGATGTGTATAAGAGACAG
+>PrefixNX/2
+AGATGTGTATAAGAGACAG
+```
 
-`input.sh`         Points to .fa file with the output dir names, and the input dir names.
+- `hisatidx.fa` — Points to directory with the reference genome for HISAT2. More info at the [HISAT2 website.](https://ccb.jhu.edu/software/hisat2)
 
-refannot          Points to directory for the reference gene annotation file used by StringTie.
+- `input.sh` — Points to .fa file with the output dir names, and the input dir names. Col. 1 are the output folder names, Col. 2 are the input folder names. The columns need to be able to be read by a "while read" loop, so they must be separated by a single space or a tab. Leave the final line blank or it ignores the last entry.
 
-runpath           All SEQ DATA to be processed is named in $C2sampledir.
+```
+cfw01 160322_NS500351_0115_AH5KKCAFXX
+cfw02 160525_NS500351_0135_AH2F2YBGXY
+cfw03 160502_NS500351_0128_AHWT7FBGXX
+cfw04 160503_NS500351_0129_AHY5YVBGXX
+
+```
+
+- `refannot` — Points to directory for the reference gene annotation file used by StringTie.
+
+- `runpath` — All SEQ DATA to be processed is named in $C2sampledir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -221,30 +253,6 @@ FASTQ FILE NAMING CONVENTIONS
 rawNAMES          Naming convention of the RAW fastq files for QC.
 trimNAMES         Naming convention for the RAW fastq files being TRIMMED.
 
-
-## C. Example Import File Formats
-
-
-adapters.sh   Note¹: Adapters can be found in the SampleSheet.csv files of the raw data.
-
-```
->PrefixNX/1
-AGATGTGTATAAGAGACAG
->PrefixNX/2
-AGATGTGTATAAGAGACAG
-```
-
-inputfile.sh  Note¹: Always leave the final line blank or it ignores the last entry.
-              Note²: Col. 1 are the output folder names, Col. 2 are the input folder names.
-              Note³: The columns need to be able to be read by a "while read" loop,
-                     so they must be separated by a single space or a tab.
-
-```
-cfw01 160322_NS500351_0115_AH5KKCAFXX
-cfw02 160525_NS500351_0135_AH2F2YBGXY
-cfw03 160502_NS500351_0128_AHWT7FBGXX
-cfw04 160503_NS500351_0129_AHY5YVBGXX
-```
 
 
 # IV. SOFTWARE NOTES
