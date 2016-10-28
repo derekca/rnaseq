@@ -1,5 +1,7 @@
 # CONTENTS
 
+
+
 01  Software used
 
 02  Script pipeline summary
@@ -20,19 +22,22 @@
   c  Trimmomatic
 
 
+
 # I. GENERAL OVERVIEW
+
+
 
 ## *File List*
 
-- ***00_submit.sh*** — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
-- ***01_pipeline.sh*** — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
-- ***02_bcl2fastq2.sh*** — Runs bcl2fastq on a sample.
-- ***03_fastqc.sh*** — Checks quality of RAW or TRIMMED fastq files.
-- ***04_trimmomatic.sh*** — Runs Trimmomatic on files in the "raw" folder.
-- ***05_map_align.sh*** — Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
-- ***06_sexing.sh*** — Reads bam files out of a 'bam' folder that should already exist. Finds the Y-linked Eif2s3y gene, which determines sex. Exports a spreadsheet.
-- ***AA_qsub_split.sh*** — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
-- ***AL_logs.sh*** — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
+- *00_submit.sh* — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
+- *01_pipeline.sh* — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
+- *02_bcl2fastq2.sh* — Converts the (raw) bcl files to fastq, using bcl2fastq.
+- *03_fastqc.sh* — Checks quality of RAW or TRIMMED fastq files.
+- *04_trimmomatic.sh* — Trims the adapters off of the RAW fastq files, using Trimmomatic.
+- *05_map_align.sh* — Maps/aligns the trimmed reads with the reference genome. Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
+- *06_sexing.sh* — Uses a Y-chromosome gene (Eif2s3y) to confirm the sex of the samples. Reads bam files out of a 'bam' folder and exports the number of genes that appear into a spreadsheet.
+- *AA_qsub_split.sh* — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
+- *AL_logs.sh* — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
 
 ## *Software Used*
 
@@ -54,49 +59,36 @@ The following tools must be downloaded and installed on your server in order to 
 [ST]: https://ccb.jhu.edu/software/stringtie/
 [TR]: http://www.usadellab.org/cms/?page=trimmomatic
 
+
+
 # II. SCRIPT PIPELINE SUMMARY
+
+
 
 ## *A. Script Usage*
 
-***./00_submit.sh*** `<suffix>`
-
-***./01_pipeline.sh*** `<suffix>`
-
-***./02_bcl2fastq2.sh*** `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
-
-***./03_fastqc.sh*** `<out>` `<QCout>` `<QCnames>`
-
-***./04_trimmomatic.sh*** `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
-
-***./05_map_align.sh*** `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
-
-***./06_sexing.sh*** `<bam>` `<sexOUT>`
-
-***./AA_qsub_split.sh***
-
-***./AL_logs.sh*** `<module>` `<logjob>` `<input1>` `<input2>`
 
 
+*./00_submit.sh* `<suffix>`
 
-## *B. Script Descriptions*
+*./01_pipeline.sh* `<suffix>`
 
-```
-─┤00├─  
-─┤01├─  
- │  │
-─┤02├─  Converts the (raw) bcl files to fastq.
- │  │
-─┤03├─  Checks quality of raw (or trimmed) fastq files.
- │  │
-─┤04├─  Trims the adapters off of the RAW fastq.
- │  │
-─┤05├─  Maps/aligns the trimmed reads with the reference genome.
- │  │
-─┤06├─  Uses a Y-chromosome gene to confirm the sex of the samples.
- │  │
-─┤AL├─  Updates the logfile when a subscript calls for it.
- │  │
-```
+*./02_bcl2fastq2.sh* `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
+
+*./03_fastqc.sh* `<out>` `<QCout>` `<QCnames>`
+
+*./04_trimmomatic.sh* `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
+
+*./05_map_align.sh* `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
+
+*./06_sexing.sh* `<bam>` `<sexOUT>`
+
+*./AA_qsub_split.sh*
+
+*./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>`
+
+
+
 
 df
 ```
