@@ -78,32 +78,6 @@ The following tools must be downloaded and installed on your server in order to 
 
 
 
-```
-     DIRECTORY                 PASSED VARIABLES
-┬
-├─▢ AA_qsub_split.sh
-│ │
-│ └─▢ 00_submit.sh            suffix
-│   │
-│   └─▢ 01_pipeline.sh        suffix
-│     │
-│     ├─▢ 02_bcl2fastq2.sh    raw    QCraw   runpath   rawNAMES
-│     │ │
-│     │ └─▢ 03_fastqc.sh      raw    QCraw   rawNAMES
-│     │
-│     ├─▢ 04_trimmomatic.sh   raw    trim    QCtrim    adapters  trimNAMES
-│     │ │
-│     │ └─▢ 03_fastqc.sh      trim   QCtrim  trimNAMES
-│     │
-│     ├─▢ 05_map_align.sh     trim   bam     fpkm   ctab   hisatidx   refannot
-│     │
-│     └─▢ 06_sexing.sh        bam    sexOUT
-│
-└─▢ AL_logs.sh                module logjob input1     input2
-```
-
-
-
 ## *B. Script Descriptions*
 
 ```
