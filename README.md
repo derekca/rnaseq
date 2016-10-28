@@ -1,32 +1,47 @@
 # I. GENERAL OVERVIEW
 
-## *A. Pipeline Overview*
+## *A. File List*
+
+- *./AA_qsub_split.sh* — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
+
+- *./00_submit.sh* `<suffix>` — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
+
+- *./01_pipeline.sh* `<suffix>` — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
+
+- *./02_bcl2fastq2.sh* `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>` — Converts the (raw) bcl files to fastq, using bcl2fastq.
+
+- *./03_fastqc.sh* `<out>` `<QCout>` `<QCnames>` — Checks quality of RAW or TRIMMED fastq files.
+
+- *./04_trimmomatic.sh* `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>` — Trims the adapters off of the RAW fastq files, using Trimmomatic.
+
+- *./05_map_align.sh* `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>` — Maps/aligns the trimmed reads with the reference genome. Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
+
+- *./06_sexing.sh* `<bam>` `<sexOUT>` — Uses a Y-chromosome gene (Eif2s3y) to confirm the sex of the samples. Reads bam files out of a 'bam' folder and exports the number of genes that appear into a spreadsheet.
+
+- *./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>` — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
+
+## *B. Pipeline Overview*
 
 This pipeline takes raw NextSeq data, converts the BCL files to FASTQ files, trims the adapters off of those sequences, and then aligns the trimmed sequences onto a reference genome.
 
-An additional step sexes the (mouse) samples by searching for the presence of a mouse Y-chromosome gene, Eif2s3y. However, this particular step can be excluded in non-mouse samples, or modified with a different gene and chromosomal coordinate. This step serves as a validation of the sample, but does not contribute to the alignments in any way.
+An additional step sexes the (mouse) samples by searching for the presence of a mouse Y-chromosome gene, Eif2s3y. However, this particular step can be excluded in non-mouse samples entirely, or modified with a different gene and chromosomal coordinate. This step serves only as an additional validation of the sample being sequenced, but does not contribute to the alignments in any way.
+
+The pipeline is initiated by submitting the `00` script to the server (using `qsub`). Since this script runs the pipeline on all of the samples presented to it in a sequential manner, this may be slow for a large number of samples. Instead, the `AA` script can be used to split the job up into individual samples before submitting it to the server.
+
+From there, the `01` pipeline script is run, which .............
+
+
+## *C. Running the Pipeline*
+
+
+
 
 This pipeline requires several files as input from the user before being ready to run.
 
+- Next seq data
 - sd
 - sd
 - sd
-- sd
-
-
-## *File List*
-
-- *00_submit.sh* — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
-- *01_pipeline.sh* — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
-- *02_bcl2fastq2.sh* — Converts the (raw) bcl files to fastq, using bcl2fastq.
-- *03_fastqc.sh* — Checks quality of RAW or TRIMMED fastq files.
-- *04_trimmomatic.sh* — Trims the adapters off of the RAW fastq files, using Trimmomatic.
-- *05_map_align.sh* — Maps/aligns the trimmed reads with the reference genome. Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
-- *06_sexing.sh* — Uses a Y-chromosome gene (Eif2s3y) to confirm the sex of the samples. Reads bam files out of a 'bam' folder and exports the number of genes that appear into a spreadsheet.
-- *AA_qsub_split.sh* — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
-- *AL_logs.sh* — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
-
-## *Software Used*
 
 The following tools must be downloaded and installed on your server in order to run the scripts in this repository. The version numbers used to generate these scripts are included, but other versions should work unless substantial changes were made to the tool's accepted syntax.
 
@@ -50,29 +65,7 @@ The following tools must be downloaded and installed on your server in order to 
 
 
 
-## *B. Script Usage*
 
-- *./00_submit.sh* `<suffix>`
-
-- *./01_pipeline.sh* `<suffix>`
-
-- *./02_bcl2fastq2.sh* `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>`
-
-- *./03_fastqc.sh* `<out>` `<QCout>` `<QCnames>`
-
-- *./04_trimmomatic.sh* `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>`
-
-- *./05_map_align.sh* `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>`
-
-- *./06_sexing.sh* `<bam>` `<sexOUT>`
-
-- *./AA_qsub_split.sh*
-
-- *./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>`
-
-
-
-## *B. Running the Pipeline*
 
 The following files are necessary to run these scripts, and should be assembled beforehand. Descriptions of each file are below.
 
