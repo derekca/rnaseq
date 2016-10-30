@@ -52,7 +52,7 @@ This pipeline requires several files as input from the user before being ready t
     └─▣ refannot.gtf   ▣ stringtie gene annotation reference
 ```
 
-- `$runpath` — This path directs the script to the folder containing all of the raw Next-Seq data. Make sure that the folder contains a spreadsheet called `SampleSheet.csv` (case-sensitive) with the sample data, as this is read by bcl2fastq2.
+- `$runpath` — This path directs the script to the folder containing all of the folders containing the raw Next-Seq data. Make sure that each folder in this directory contains a spreadsheet called `SampleSheet.csv` (case-sensitive) with the sample data, as this is read by bcl2fastq2.
 
 - `adapters.fa` — Points to a file containing all the adapters to be trimmed. Adapters can be found in the `SampleSheet.csv` which is contained in the raw NextSeq data files, or the equivalent file for your data. This file should be produced on your own, using the following template:
 ```
@@ -64,12 +64,12 @@ AGATGTGTATAAGAGACAG
 
 - `hisatidx` — Points to directory with the reference genome for HISAT2. More info can be found at the [HISAT2 website](https://ccb.jhu.edu/software/hisat2) along with reference indices that can downloaded, if you do not want to generate your own. Regardless of the index's source, the reference genome being pointed at with this variable should be named `genome.fa`.
 
-- `input.sh` — Points to .fa file with the output dir names, and the input dir names. Col. 1 are the output folder names, Col. 2 are the input folder names. The columns need to be able to be read by a "while read" loop, so they must be separated by a single space or a tab. Leave the final line blank or it ignores the last entry.
+- `input.sh` — Points to a `.fa` file with two columns. Column 1 contains the user-selected output directory names, which is something useful for the user to identify which samples are being run. Column 2 contains the input directory names, which is the name of the folder being described by `$runpath`. including Column 1 are the output folder names, Column 2 are the input folder names. The columns need to be able to be read by a "while read" loop, so they must be separated by a single space or a tab. Leave the final line blank or it ignores the last entry.
 ```
-cfw01 160322_NS500351_0115_AH5KKCAFXX
-cfw02 160525_NS500351_0135_AH2F2YBGXY
-cfw03 160502_NS500351_0128_AHWT7FBGXX
-cfw04 160503_NS500351_0129_AHY5YVBGXX
+sample01 160322_NS500351_0115_AH5KKCAFXX
+sample02 160525_NS500351_0135_AH2F2YBGXY
+sample03 160502_NS500351_0128_AHWT7FBGXX
+sample04 160503_NS500351_0129_AHY5YVBGXX
 
 ```
 
