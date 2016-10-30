@@ -1,5 +1,6 @@
 # I. GENERAL OVERVIEW
 
+
 ### *A. File List*
 
 - *./AA_qsub_split.sh* — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
@@ -38,24 +39,25 @@ Throughout this whole process, the logging script `AL` is called and writes into
 
 # II. RUNNING THE PIPELINE
 
+
 ### *A. Required Inputs*
 
 This pipeline requires several files as input from the user before being ready to run, all of which should be downloaded or generated beforehand. All of these variables should be defined by the user in the `01_pipeline.sh` script, easily located in the appropriately annotated section. Descriptions of each file are below.
 
 ```
 ┬
-└─▣ $HOME              ▣ home directory
-  ├─▣ ../$runpath      ▣ location of Next-seq data
-  └─▣ $import          ▣ location of "Import Files"
-    ├─▣ adapters.fa    ▣ adapters file
-    ├─▣ input.sh       ▣ input file
-    ├─▣ hisatidx.fa    ▣ hisat reference index
-    └─▣ refannot.gtf   ▣ stringtie gene annotation reference
+└─▢ $HOME              ▢ home directory
+  ├─▢ ../$runpath      ▢ location of Next-seq data
+  └─▢ $import          ▢ location of "Import Files"
+    ├─▢ adapters.fa    ▢ adapters file
+    ├─▢ input.sh       ▢ input file
+    ├─▢ hisatidx.fa    ▢ hisat reference index
+    └─▢ refannot.gtf   ▢ stringtie gene annotation reference
 ```
 
-- `$runpath` — This path directs the script to the folder containing all of the folders containing the raw Next-Seq data. Make sure that each folder in this directory contains a spreadsheet called `SampleSheet.csv` (case-sensitive) with the sample data, as this is read by bcl2fastq2.
+- `$runpath` — This path directs the script to the folder containing all of the folders containing the raw Next-Seq data. Make sure that each folder in this directory contains a spreadsheet called 'SampleSheet.csv' (case-sensitive) with the sample data, as this is read by bcl2fastq2.
 
-- `adapters.fa` — Points to a file containing all the Illumina pair-end adapters to be trimmed from the raw data. Adapters can be found in the `SampleSheet.csv` which is contained in the raw NextSeq data files, or the equivalent file for your data. This file should be produced on your own, using the following template:
+- `adapters.fa` — Points to a file containing all the Illumina pair-end adapters to be trimmed from the raw data. Adapters can be found in the 'SampleSheet.csv' which is contained in the raw NextSeq data files, or the equivalent file for your data. This file should be produced on your own, using the following template:
 ```
 >PrefixNX/1
 AGATGTGTATAAGAGACAG
@@ -63,7 +65,7 @@ AGATGTGTATAAGAGACAG
 AGATGTGTATAAGAGACAG
 ```
 
-- `hisatidx` — Points to directory with the reference genome for HISAT2. More info can be found at the [HISAT2 website](https://ccb.jhu.edu/software/hisat2) along with reference indices that can downloaded, if you do not want to generate your own. Regardless of the index's source, the reference genome being pointed at with this variable should be named `genome.fa`.
+- `hisatidx` — Points to directory with the reference genome for HISAT2. More info can be found at the [HISAT2 website](https://ccb.jhu.edu/software/hisat2) along with reference indices that can downloaded, if you do not want to generate your own. Regardless of the index's source, the reference genome being pointed at with this variable should be named 'genome.fa'.
 
 - `input.sh` — Points to a `.fa` file with two columns. Column 1 (also called `C1exportdir` in the script comments) contains the user-selected output directory names, which is something useful for the user to identify which samples are being run. Column 2 (also called `C2sampledir` in the script comments) contains the input directory names, which is the name of the folder being described by `$runpath`. These folders can sometimes have human-unfriendly names, which is why including custom names into Column 1 is permitted. The columns need to be able to be read by a `while read` loop, so they must be separated by a single space or a tab. Leave the final line of the list blank.
 ```
@@ -84,7 +86,7 @@ sample04 160503_NS500351_0129_AHY5YVBGXX
 
 Additional inputs from the user include naming conventions for files that need to be read by the various scripts. These include:
 
-- `rawNAMES` — Naming convention of the raw fastq files for use by FastQC. This depends on how the Illumina raw data is named (ie. `Sample1.fastq.gz`, `Sample 2.fastq.gz`, etc) and also which files the user is interested in looking at.
+- `rawNAMES` — Naming convention of the raw fastq files for use by FastQC. This depends on how the Illumina raw data is named (ie. 'Sample1.fastq.gz', 'Sample 2.fastq.gz', etc) and also which files the user is interested in looking at.
 
 - `trimNAMES` — Naming convention for the trimmed fastq files for use by FastQC. 
 
@@ -107,54 +109,38 @@ In addition, the following tools must be downloaded and installed on your server
 [TR]: http://www.usadellab.org/cms/?page=trimmomatic
 
 
-### *B. Directories/files that are created by these scripts*
+### *B. Export: Directories/files that are created by these scripts*
 
+
+This pipeline generates a directory containing many sets of files as output. The paths where these directories are made is completely up to the user, but as a default they will be contained within a folder (with the sample name), inside of another folder called 'Export', which is inside of the `$HOME` folder. The following structure is used:
 
 ```
-DIRECTORY            USR¹  DESCRIPTION
----------------------------------------
 ┬
-└─▣ $HOME              ▣    home directory
-  │
-  ├─▢ $exportdir       ▢    output path is user-specified
-  │ ├─▢ bam            ▢    bam  files
-  │ ├─▢ ctab           ▢    ctab files
-  │ ├─▢ Eif2s3y.tsv    ▢    sex determination spreadsheet
-  │ ├─▢ fpkm           ▢    fpkm files
-  │ ├─▢ QCraw          ▢    raw  fastq quality check
-  │ ├─▢ QCtrim         ▢    trim fastq quality check
-  │ ├─▢ raw            ▢    raw  fastq files from bcl
-  │ └─▢ trim           ▢    trim fastq files
-  │
-  ├─▢ $logdir          ▢    location of logfiles
-  │ └─▢ $logfile       ▢    logfile in its folder
-  │
-  ├─▢ stderr.log       ▢    standard error file
-  └─▢ stdout.log       ▢    standard output file
-
+└─▢ $HOME              ▢ home directory
+  ├─▢ $exportdir       ▢ output path is user-specified
+  │ ├─▢ bam            ▢ bam  files
+  │ ├─▢ ctab           ▢ ctab files
+  │ ├─▢ Eif2s3y.tsv    ▢ sex determination spreadsheet
+  │ ├─▢ fpkm           ▢ fpkm files
+  │ ├─▢ QCraw          ▢ raw  fastq quality check
+  │ ├─▢ QCtrim         ▢ trim fastq quality check
+  │ ├─▢ raw            ▢ raw  fastq files from bcl
+  │ └─▢ trim           ▢ trim fastq files
+  ├─▢ $logdir          ▢ location of logfiles
+  │ ├─▢ $logerr        ▢ exported sterr output in its folder
+  │ └─▢ $logfile       ▢ logfile in its folder
+  ├─▢ stderr.log       ▢ most recent standard error file
+  └─▢ stdout.log       ▢ most recent standard output file
 ```
 
-DIRECTORIES FROM INPUT.SH
------------------------------
-
-EXPORT FILES
------------------------------
-bam               This is where the BAM and SORTED.BAM files go.
-ctab              This is where the CTAB files go.
-fpkm              This is where the FPKM files go.
-QCraw             This is where the RAW FastQC output goes.
-QCtrim            This is where the TRIMMED FastQC output goes.
-raw               This is where the RAW bcl2fastq2 files go.
-sexOUT            The output file for the sex determination.
-trim              This is where the TRIMMED reads go.
-
-
-
-
-
-
-
-
+- `bam` — This is where the BAM and SORTED.BAM files go from HISAT.
+- `ctab` — This is where the CTAB files go from StringTie.
+- `fpkm` — This is where the FPKM files go from StringTie.
+- `QCraw` — This is where the raw FastQC output goes.
+- `QCtrim` — This is where the trimmed FastQC output goes.
+- `raw` — This is where the raw bcl2fastq2 files go.
+- `sexOUT` — The output file for the sex determination.
+- `trim` — This is where the trimmed reads go after Trimmomatic.
 
 
 # III. SOFTWARE NOTES
