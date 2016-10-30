@@ -20,6 +20,7 @@
 
 - *./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>` — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
 
+
 ### *B. Pipeline Overview*
 
 This pipeline takes raw NextSeq data, converts the BCL files to FASTQ files, trims the adapters off of those sequences, and then aligns the trimmed sequences onto a reference genome.
@@ -37,7 +38,7 @@ Throughout this whole process, the logging script `AL` is called and writes into
 
 # II. RUNNING THE PIPELINE
 
-### *A. Required Input Files*
+### *A. Required Inputs*
 
 This pipeline requires several files as input from the user before being ready to run, all of which should be downloaded or generated beforehand. All of these variables should be defined by the user in the `01_pipeline.sh` script, easily located in the appropriately annotated section. Descriptions of each file are below.
 
@@ -64,7 +65,7 @@ AGATGTGTATAAGAGACAG
 
 - `hisatidx` — Points to directory with the reference genome for HISAT2. More info can be found at the [HISAT2 website](https://ccb.jhu.edu/software/hisat2) along with reference indices that can downloaded, if you do not want to generate your own. Regardless of the index's source, the reference genome being pointed at with this variable should be named `genome.fa`.
 
-- `input.sh` — Points to a `.fa` file with two columns. Column 1 (also `C1`) contains the user-selected output directory names, which is something useful for the user to identify which samples are being run. Column 2 (also `C2`) contains the input directory names, which is the name of the folder being described by `$runpath`. These folders can sometimes have human-unfriendly names, which is why including custom names into Column 1 is permitted. The columns need to be able to be read by a `while read` loop, so they must be separated by a single space or a tab. Leave the final line of the list blank.
+- `input.sh` — Points to a `.fa` file with two columns. Column 1 (also called `C1exportdir` in the script comments) contains the user-selected output directory names, which is something useful for the user to identify which samples are being run. Column 2 (also called `C2sampledir` in the script comments) contains the input directory names, which is the name of the folder being described by `$runpath`. These folders can sometimes have human-unfriendly names, which is why including custom names into Column 1 is permitted. The columns need to be able to be read by a `while read` loop, so they must be separated by a single space or a tab. Leave the final line of the list blank.
 ```
 sample01 160322_NS500351_0115_AH5KKCAFXX
 sample02 160525_NS500351_0135_AH2F2YBGXY
@@ -73,12 +74,19 @@ sample04 160503_NS500351_0129_AHY5YVBGXX
 
 ```
 
-- `refannot` — Points to the directory for the reference gene annotation file used by StringTie.
+- `refannot` — Points to the directory for the reference gene annotation file used by StringTie to guide the assembly process. The [StringTie website][refann1] offers suggestions on where to generate the reference annotation file (in GTF or GFF3 format). The reference annotation file can come from any appropriate source, ie. [UCSC,][refann2] [Ensembl,][refann3] [NCBI,][refann4] etc. Ensembl has them under ["Downloads" > "Download Data via FTP"][refann5].
 
-Use the reference annotation file (in GTF or GFF3 format) to guide the assembly process. The output will include expressed reference transcripts as well as any novel transcripts that are assembled. This option is required by options -B, -b, -e, -C (see below). Can come from UCSC, Ensembl, NCBI, etc. Ensembl has them under "Downloads" > "Download Data via FTP".
+[refann1]: https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual
+[refann2]: http://genome.ucsc.edu/
+[refann3]: http://www.ensembl.org/index.html
+[refann4]: https://www.ncbi.nlm.nih.gov/
+[refann5]: http://www.ensembl.org/info/data/ftp/index.html
 
+Additional inputs from the user include naming conventions for files that need to be read by the various scripts. These include:
 
+- `rawNAMES` — Naming convention of the raw fastq files for use by FastQC. This depends on how the Illumina raw data is named (ie. `Sample1.fastq.gz`, `Sample 2.fastq.gz`, etc) and also which files the user is interested in looking at.
 
+- `trimNAMES` — Naming convention for the trimmed fastq files for use by FastQC. 
 
 In addition, the following tools must be downloaded and installed on your server in order to run the scripts in this repository. The version numbers used to generate these scripts are included, but other versions should work unless substantial changes were made to the tool's accepted syntax.
 
@@ -97,28 +105,6 @@ In addition, the following tools must be downloaded and installed on your server
 [SA]: http://samtools.sourceforge.net/
 [ST]: https://ccb.jhu.edu/software/stringtie/
 [TR]: http://www.usadellab.org/cms/?page=trimmomatic
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ### *B. Directories/files that are created by these scripts*
@@ -150,8 +136,6 @@ DIRECTORY            USR¹  DESCRIPTION
 
 DIRECTORIES FROM INPUT.SH
 -----------------------------
-C1exportdir       Points to the output folders that get made to store all the data.
-C2sampledir       Points to the directory where the sequence data to be analyzed is located.
 
 EXPORT FILES
 -----------------------------
@@ -163,20 +147,6 @@ QCtrim            This is where the TRIMMED FastQC output goes.
 raw               This is where the RAW bcl2fastq2 files go.
 sexOUT            The output file for the sex determination.
 trim              This is where the TRIMMED reads go.
-
-FASTQ FILE NAMING CONVENTIONS
------------------------------
-rawNAMES          Naming convention of the RAW fastq files for QC.
-trimNAMES         Naming convention for the RAW fastq files being TRIMMED.
-
-
-FASTQ FILE NAMING CONVENTIONS
-rawNAMES     Naming convention of the RAW fastq files for QC.
-              The '[!Undetermined]*' ignores 'Undetermined' files.
-trimNAMES  Naming convention for the RAW fastq files being TRIMMED.
-            This focuses on the R1 names, because the Trimmomatic
-              parameters will change the R1 to R2 later.
-                '[1-9]*R1*' focuses only on R1 files starting with a number.
 
 
 
