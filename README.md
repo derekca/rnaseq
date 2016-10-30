@@ -1,7 +1,26 @@
+# Contents
+
+- ***I. General Overview***
+
+- - *A. File List*
+
+- - *B. Pipeline Overview*
+
+- ***II. Running the Pipeline***
+
+- - *A. Required Inputs*
+
+- - *B. Generated Export Files*
+
+- ***III. Author Notes***
+
+- - -
+
 # I. GENERAL OVERVIEW
 
 
 ### *A. File List*
+
 
 - *./AA_qsub_split.sh* — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
 
@@ -24,6 +43,7 @@
 
 ### *B. Pipeline Overview*
 
+
 This pipeline takes raw NextSeq data, converts the BCL files to FASTQ files, trims the adapters off of those sequences, and then aligns the trimmed sequences onto a reference genome.
 
 An additional step sexes the (mouse) samples by searching for the presence of a mouse Y-chromosome gene, Eif2s3y. However, this particular step can be excluded in non-mouse samples entirely, or modified with a different gene and chromosomal coordinate for the user's specific use. This step serves only as an additional validation of the samples being sequenced, but does not contribute to the alignments or their analysis in any way.
@@ -41,6 +61,7 @@ Throughout this whole process, the logging script `AL` is called and writes into
 
 
 ### *A. Required Inputs*
+
 
 This pipeline requires several files as input from the user before being ready to run, all of which should be downloaded or generated beforehand. All of these variables should be defined by the user in the `01_pipeline.sh` script, easily located in the appropriately annotated section. Descriptions of each file are below.
 
@@ -109,7 +130,7 @@ In addition, the following tools must be downloaded and installed on your server
 [TR]: http://www.usadellab.org/cms/?page=trimmomatic
 
 
-### *B. Export: Directories/files that are created by these scripts*
+### *B. Generated Export Files*
 
 
 This pipeline generates a directory containing many sets of files as output. The paths where these directories are made is completely up to the user, but as a default they will be contained within a folder (with the sample name), inside of another folder called 'Export', which is inside of the `$HOME` folder. The following structure is used:
@@ -143,97 +164,8 @@ This pipeline generates a directory containing many sets of files as output. The
 - `trim` — This is where the trimmed reads go after Trimmomatic.
 
 
-# III. SOFTWARE NOTES
+# III. AUTHOR NOTES
 
-## *A. HISAT*
-
-```
-hisat2 -x <index>     Run HISAT2 using this reference genome index. Can be downloaded
-                      from https://ccb.jhu.edu/software/hisat2
--1                    Comma-separated list of files containing mate 1s.
--2                    Comma-separated list of files containing mate 2s
---rna-strandedness    Specify strand-specific information: the default
-                      is unstranded. For single-end reads [F] means a
-                      read corresponds to a transcript, and [R] is rev compl.
-                      For paired-end reads, use [FR] or [RF].
--dta                  Report alignments tailored for transcript assemblers, ie StringTie.
--p <int>              Launch NTHREADS parallel build threads (default: 1).
-
-samtools sort         Sort alignments by leftmost coordinates, or by read name when the
-                      [-n] option is used.
-samtools view         With no options or regions specified, prints all alignments in the
-                      specified input alignment file (in SAM, BAM, or CRAM format) to
-                      standard output in SAM format (with no header). Using [-S] was required
-                      (in previous versions) if input was in SAM format, but now the correct
-                      format is automatically detected. The [-u] option outputs uncompressed
-                      BAM. This option saves time spent on compression/decompression and is
-                      thus preferred when the output is piped to another samtools command.
-```
-
-## *B. StringTie*
-
-```
-stringtie <input.bam> Run StringTie using the input *.bam file(s)
--o <out.gtf>          Sets output GTF name where StringTie writes assembled transcripts.
--p <int>              Specify number of processing threads (CPUs). Default is 1.
--G <ref_ann.gff>    	Use the reference annotation file (in GTF or GFF3 format) to guide
-                      the assembly process. The output will include expressed reference
-                      transcripts as well as any novel transcripts that are assembled.
-                      This option is required by options -B, -b, -e, -C (see below).
-                      Can come from UCSC, Ensembl, NCBI, etc. Ensembl has them under
-                      "Downloads" > "Download Data via FTP".
--b <path>             Enables the output of *.ctab files for Ballgown, but these files will
-                      be created in the provided directory <path> instead of the directory
-                      specified by the -o option. Note: adding the -e option is recommended
-                      with the -B/-b options, unless novel transcripts are still wanted in
-                      the StringTie GTF output.
--e                    Limits the processing of read alignments to only estimate and output
-                      the assembled transcripts matching the reference transcripts given
-                      with the -G option (requires -G, recommended for -B/-b). Boosts speed.
-```
-
-## *C. Trimmomatic*
-
-
-```
-java -jar <path to trimmomatic.jar> \                 Run JAR filepath
-          [PE] \                                      Paired End Mode (as opposed to SE)
-          [-threads <threads>] \                      indicates # threads to on multi-core computers.
-          [-phred33 | -phred64] \                     Specifies the base quality encoding.
-          [-trimlog<logFile>] \                       Creates a log of all read trimmings with:
-                                                      - read name
-                                                      - surviving sequence length
-                                                      - loc of 1st surviving base (amt trimmed from start)
-                                                      - loc of last surviving base in original read
-                                                      - amount trimmed from the end
-          [-basein <in> | <inR1><inR2>] \             Input .gz files from the RAW reads.
-          [-baseout <out> | <R1p><R1up><R2p><R2up> \  The 4 outputs.
-          [...]                                       Any of the additional options, below.
-
-          TRIMMOMATIC OPTIONS:
-          ILLUMINACLIP:   Cut adapter and other illumina-specific sequences from the read.
-          SLIDINGWINDOW:  Performs a sliding window trimming approach. It starts scanning
-                          at the 5‟ end and clips the read once the average quality within
-                          within the window falls below a threshold.
-          MAXINFO:        An adaptive quality trimmer which balances read length and error
-                          rate to maximise the value of each read.
-          LEADING:        Cut bases off the start of a read, if below a threshold quality
-          TRAILING:       Cut bases off the end of a read, if below a threshold quality
-          CROP:           Cut the read to a specified length by removing bases from the end
-          HEADCROP:       Cut the specified number of bases from the start of the read
-          MINLEN:         Drop the read if it is below a specified length
-          AVGQUAL:        Drop the read if the average quality is below the specified level
-          TOPHRED33:      Convert quality scores to Phred-33
-          TOPHRED64:      Convert quality scores to Phred-64
-```
-
-
-
-
-
-
-
-# IV. AUTHOR NOTES
 
 - **Author:** Derek Caetano-Anolles
 - **Repository:** [github.com/derekca](https://github.com/derekca)
