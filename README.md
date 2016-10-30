@@ -99,7 +99,7 @@ sample04 160503_NS500351_0129_AHY5YVBGXX
 
 ```
 
-- `refannot` — Points to the directory for the reference gene annotation file used by StringTie to guide the assembly process. The [StringTie website][refann1] offers suggestions on where to generate the reference annotation file (in GTF or GFF3 format). The reference annotation file can come from any appropriate source, ie. [UCSC,][refann2] [Ensembl,][refann3] [NCBI,][refann4] etc. Ensembl has them under ["Downloads" > "Download Data via FTP"][refann5].
+- `refannot` — Points to the directory for the reference gene annotation file used by StringTie to guide the assembly process. The [StringTie website][refann1] offers suggestions on where to generate the reference annotation file (in GTF or GFF3 format). The reference annotation file can come from any appropriate source, ie. [UCSC,][refann2] [Ensembl,][refann3] [NCBI,][refann4] etc. Ensembl has them under [*Downloads > Download Data via FTP*][refann5].
 
 [refann1]: https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual
 [refann2]: http://genome.ucsc.edu/
