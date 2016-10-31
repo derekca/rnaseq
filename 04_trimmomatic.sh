@@ -28,7 +28,7 @@ mkdir -p $trim
 #└──────────────┴─────────┴────────────────────────────────────────────┘
 
 # Directory of Trimmomatic JAR
-DIRtrimmomatic="$HOME/../../opt/biosoftware/trimmomatic/Trimmomatic-0.35/trimmomatic-0.35.jar"
+DIRtrimmomatic="$HOME/../../file/path/to/trimmomatic-0.35.jar"
 
 # Run Trimmomatic JAR on the raw Fastq files, into the trimmed folder.
 for fastq1 in `ls $raw/$trimNAMES`
