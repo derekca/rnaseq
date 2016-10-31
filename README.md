@@ -156,14 +156,14 @@ This pipeline generates a directory containing many sets of files as output. The
   └─▢ stdout.log       ▢ most recent standard output file
 ```
 
-- `bam` — This is where the BAM and SORTED.BAM files go from HISAT.
-- `ctab` — This is where the CTAB files go from StringTie.
-- `fpkm` — This is where the FPKM files go from StringTie.
-- `QCraw` — This is where the raw FastQC output goes, referenced as `QCout` in the FastQC script.
-- `QCtrim` — This is where the trimmed FastQC output goes, referenced as `QCout` in the FastQC script.
-- `raw` — This is where the raw bcl2fastq2 files go, referenced as `out` in the FastQC script.
-- `sexOUT` — The output file for the sex determination.
-- `trim` — This is where the trimmed reads go after Trimmomatic, referenced as `out` in the FastQC script.
+- `bam` : This is where the BAM and SORTED.BAM files go from HISAT.
+- `ctab` : This is where the CTAB files go from StringTie.
+- `fpkm` : This is where the FPKM files go from StringTie.
+- `QCraw` : This is where the raw FastQC output goes, referenced as `QCout` in the FastQC script.
+- `QCtrim` : This is where the trimmed FastQC output goes, referenced as `QCout` in the FastQC script.
+- `raw` : This is where the raw bcl2fastq2 files go, referenced as `out` in the FastQC script.
+- `sexOUT` : The output file for the sex determination.
+- `trim` : This is where the trimmed reads go after Trimmomatic, referenced as `out` in the FastQC script.
 
 
 ## III. Author Notes <a id="anchor-3"></a>
