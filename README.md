@@ -24,23 +24,23 @@
 ### *A. File List*
 
 
-- *./AA_qsub_split.sh* — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
+- `./AA_qsub_split.sh` — Splits an input file into individual jobs for the 00 script. Not necessary in the pipe, but convenient when there are many jobs. Works by taking a two-column input file (input.sh) and splits it into individual (one-line) input files that will each be individually qsub'd. Alternatively, running the submission .sh without this will run the pipeline for each row of the input, one after another.
 
-- *./00_submit.sh* `<suffix>` — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
+- `./00_submit.sh` `<suffix>` — Generic script for running any batch job to a queue. Submits the `01` script to the Cluster Nodes for batch processing. This is the starting point for all scripts run on the cluster.
 
-- *./01_pipeline.sh* `<suffix>` — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
+- `./01_pipeline.sh` `<suffix>` — Runs script for project data. All inputs out output directories are specified in this script. the inputs for all subscripts and it will carry over to the others. 
 
-- *./02_bcl2fastq2.sh* `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>` — Converts the (raw) bcl files to fastq, using bcl2fastq.
+- `./02_bcl2fastq2.sh` `<raw>` `<QCraw>` `<runpath>` `<rawNAMES>` — Converts the (raw) bcl files to fastq, using bcl2fastq.
 
-- *./03_fastqc.sh* `<out>` `<QCout>` `<QCnames>` — Checks quality of RAW or TRIMMED fastq files.
+- `./03_fastqc.sh` `<out>` `<QCout>` `<QCnames>` — Checks quality of RAW or TRIMMED fastq files.
 
-- *./04_trimmomatic.sh* `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>` — Trims the adapters off of the RAW fastq files, using Trimmomatic.
+- `./04_trimmomatic.sh` `<raw>` `<trim>` `<QCtrim>` `<adapters>` `<trimNAMES>` — Trims the adapters off of the RAW fastq files, using Trimmomatic.
 
-- *./05_map_align.sh* `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>` — Maps/aligns the trimmed reads with the reference genome. Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
+- `./05_map_align.sh` `<trim>` `<bam>` `<fpkm>` `<ctab>` `<hisatidx>` `<refannot>` — Maps/aligns the trimmed reads with the reference genome. Uses HISAT and StringTie to map/align reads that are found in a "trim" folder.
 
-- *./06_sexing.sh* `<bam>` `<sexOUT>` — Uses a Y-chromosome gene (Eif2s3y) to confirm the sex of the samples. Reads bam files out of a 'bam' folder and exports the number of genes that appear into a spreadsheet.
+- `./06_sexing.sh` `<bam>` `<sexOUT>` — Uses a Y-chromosome gene (Eif2s3y) to confirm the sex of the samples. Reads bam files out of a 'bam' folder and exports the number of genes that appear into a spreadsheet.
 
-- *./AL_logs.sh* `<module>` `<logjob>` `<input1>` `<input2>` — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
+- `./AL_logs.sh` `<module>` `<logjob>` `<input1>` `<input2>` — This script is in charge of writing the logfile. The logfile is written in a modular way, with different logfile outputs being written based on which module is called. For example, calling "ini" writes the job initiation output at the start of the logfile.
 
 
 ### *B. Pipeline Overview*
@@ -159,11 +159,11 @@ This pipeline generates a directory containing many sets of files as output. The
 - `bam` — This is where the BAM and SORTED.BAM files go from HISAT.
 - `ctab` — This is where the CTAB files go from StringTie.
 - `fpkm` — This is where the FPKM files go from StringTie.
-- `QCraw` — This is where the raw FastQC output goes.
-- `QCtrim` — This is where the trimmed FastQC output goes.
-- `raw` — This is where the raw bcl2fastq2 files go.
+- `QCraw` — This is where the raw FastQC output goes, referenced as `QCout` in the FastQC script.
+- `QCtrim` — This is where the trimmed FastQC output goes, referenced as `QCout` in the FastQC script.
+- `raw` — This is where the raw bcl2fastq2 files go, referenced as `out` in the FastQC script.
 - `sexOUT` — The output file for the sex determination.
-- `trim` — This is where the trimmed reads go after Trimmomatic.
+- `trim` — This is where the trimmed reads go after Trimmomatic, referenced as `out` in the FastQC script.
 
 
 ## III. Author Notes <a id="anchor-3"></a>
