@@ -170,6 +170,7 @@ This pipeline generates a directory containing many sets of files as output. The
 
 
 - **Author:** Derek Caetano-Anolles
+- **Website:** [derekca.xyz](http://derekca.xyz)
 - **Repository:** [github.com/derekca](https://github.com/derekca)
 - **Licenses:** Unless otherwise stated, the materials presented in this package are distributed under the [MIT License.](https://opensource.org/licenses/MIT)
 - **Acknowledgements:** These materials are based upon work supported by the National Science Foundation Postdoctoral Research Fellowship in Biology under [Grant No. 1523549.](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1523549) Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
